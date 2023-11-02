@@ -1,0 +1,6 @@
+WIDTH, HEIGHT = 600, 700
+FPS = 30
+TILE = 35
+W, H = 10, 20
+
+WHITE = (255, 255, 255)
