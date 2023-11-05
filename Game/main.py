@@ -17,15 +17,18 @@ class Main:
             if event.type == pygame.QUIT:
                 self.run = False
             elif event.type == pygame.KEYUP:
-                d_ = 0
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_SPACE:
+                    self.figures.active.rotate(self.figures.passive)
+                else:
                     d_ = 0
-                elif event.key == pygame.K_DOWN:
-                    d_ = 1
-                elif event.key == pygame.K_LEFT:
-                    d_ = 2
-                if not self.figures.active.move(self.figures.passive, d_):
-                    self.figures.add_to_passive()
+                    if event.key == pygame.K_RIGHT:
+                        d_ = 0
+                    elif event.key == pygame.K_DOWN:
+                        d_ = 1
+                    elif event.key == pygame.K_LEFT:
+                        d_ = 2
+                    if not self.figures.active.move(self.figures.passive, d_):
+                        self.figures.add_to_passive()
 
 
     def main_loop(self):
@@ -45,12 +48,12 @@ class Main:
         self.screen.fill(BLACK)
 
         # figures
-        for cord in self.figures.passive + [(i[0] + self.figures.active.pos[0], i[1] + self.figures.active.pos[1])
-                                            for i in self.figures.active.cords]:
-            try:
-                pygame.draw.rect(self.screen, RED, (cord[0] * TILE, cord[1] * TILE, TILE, TILE))
-            except:
-                pass
+        for cord in self.figures.active.cords:
+            pygame.draw.rect(self.screen, self.figures.active.color, ((self.figures.active.pos[0] + cord[0]) * TILE,
+                                                (self.figures.active.pos[1] + cord[1]) * TILE, TILE, TILE))
+        for cord in self.figures.passive:
+            pygame.draw.rect(self.screen, self.figures.passive[cord], (cord[0] * TILE, cord[1] * TILE, TILE, TILE))
+
 
         # rects
         for j in range(H):
