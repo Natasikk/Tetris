@@ -5,32 +5,15 @@ class Figures:
     def __init__(self):
         self.passive = []
         self.active = Figure()
-        self.floor = {i: [19] for i in range(10)}
 
     def append(self, fig):
         self.passive.append(fig)
-
-    def move_down(self):
-        if self.check():
-            self.active.pos[1] += 1
 
     def add_to_passive(self):
         self.passive.append(self.active)
         for cord in self.active.cords:
             a_ = (cord[0] + self.active.pos[0], cord[1] + self.active.pos[1] - 1)
-            self.floor[a_[0]].append(a_[1])
         self.active = Figure()
-
-
-    def check(self):
-        for cord in self.active.cords:
-            x, y = cord[0], cord[1]
-            x += self.active.pos[0]
-            y += self.active.pos[1]
-            for y_ in self.floor[x]:
-                if y == y_:
-                    return False
-        return True
 
 
 class Figure:
@@ -39,12 +22,42 @@ class Figure:
         self.cords = [(0, 0), (1, 0), (0, 1), (0, 2)]
         self.pos = [4, 0]
 
-    def move(self, direction):
+    def move(self, figures, direction):
+        flag = True
         if direction == 0:
-            if self.pos[0] + max([i[0] for i in self.cords]) < 9:
+            for cord in self.cords:
+                if self.pos[0] + cord[0] > 8:
+                    flag = False
+                for fig_ in figures:
+                    for cord_ in fig_.cords:
+                        if (self.pos[0] + cord[0] + 1, self.pos[1] + cord[1]) == (fig_.pos[0] + cord_[0],
+                                                                                  fig_.pos[1] + cord_[1]):
+                            flag = False
+            if flag:
                 self.pos[0] += 1
+
         elif direction == 1:
-            self.pos[1] += 1
+            for cord in self.cords:
+                if self.pos[1] + cord[1] > 18:
+                    flag = False
+                for fig_ in figures:
+                    for cord_ in fig_.cords:
+                        if (self.pos[0] + cord[0], self.pos[1] + cord[1] + 1) == (fig_.pos[0] + cord_[0],
+                                                                                  fig_.pos[1] + cord_[1]):
+                            flag = False
+            if flag:
+                self.pos[1] += 1
+            else:
+                return False
         elif direction == 2:
-            if self.pos[0] > 0:
+            if self.pos[0] < 1:
+                flag = False
+            for cord in self.cords:
+                for fig_ in figures:
+                    for cord_ in fig_.cords:
+                        if (self.pos[0] + cord[0] - 1, self.pos[1] + cord[1]) == (fig_.pos[0] + cord_[0],
+                                                                                  fig_.pos[1] + cord_[1]):
+                            flag = False
+            if flag:
                 self.pos[0] -= 1
+        return True

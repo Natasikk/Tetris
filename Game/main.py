@@ -17,22 +17,24 @@ class Main:
             if event.type == pygame.QUIT:
                 self.run = False
             elif event.type == pygame.KEYUP:
+                d_ = 0
                 if event.key == pygame.K_RIGHT:
-                    self.figures.active.move(0)
+                    d_ = 0
                 elif event.key == pygame.K_DOWN:
-                    self.figures.active.move(1)
+                    d_ = 1
                 elif event.key == pygame.K_LEFT:
-                    self.figures.active.move(2)
+                    d_ = 2
+                if not self.figures.active.move(self.figures.passive, d_):
+                    self.figures.add_to_passive()
 
 
     def main_loop(self):
         while self.run:
-            self.tick += 1
-            if self.tick % 30 == 0:
-                self.figures.move_down()
-            if not self.figures.check():
-                self.figures.add_to_passive()
             self.clock.tick(FPS)
+            self.tick += 1
+            if self.tick % FPS == 0:
+                if not self.figures.active.move(self.figures.passive, 1):
+                    self.figures.add_to_passive()
             pygame.display.set_caption(str(self.clock.get_fps()))
             self.events()
             self.render()
@@ -42,16 +44,6 @@ class Main:
     def render(self):
         self.screen.fill(BLACK)
 
-        # floor
-        for x_ in range(10):
-            for y_ in self.figures.floor[x_]:
-                pygame.draw.rect(self.screen, GREEN, (x_ * TILE, y_ * TILE, TILE, TILE))
-
-        # rects
-        for j in range(H):
-            for i in range(W):
-                pygame.draw.rect(self.screen, WHITE, (i*TILE, j*TILE, TILE, TILE), 1)
-
         # figures
         for item in self.figures.passive + [self.figures.active]:
             try:
@@ -60,6 +52,13 @@ class Main:
                                                                (item.pos[1] + cords[1]) * TILE, TILE, TILE))
             except:
                 pass
+
+        # rects
+        for j in range(H):
+            for i in range(W):
+                pygame.draw.rect(self.screen, WHITE, (i*TILE, j*TILE, TILE, TILE), 1)
+
+
 
 
 
