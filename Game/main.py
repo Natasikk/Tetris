@@ -29,7 +29,11 @@ class Main:
                         d_ = 2
                     if not self.figures.active.move(self.figures.passive, d_):
                         self.figures.add_to_passive()
-
+                        for cord in self.figures.active.cords:
+                            for cord_ in self.figures.passive:
+                                if (cord[0] + self.figures.active.pos[0], cord[1] + self.figures.active.pos[1]) \
+                                        == cord_:
+                                    self.run = False
 
     def main_loop(self):
         while self.run:
@@ -43,25 +47,21 @@ class Main:
             self.render()
             pygame.display.update()
 
-
     def render(self):
         self.screen.fill(BLACK)
 
         # figures
         for cord in self.figures.active.cords:
             pygame.draw.rect(self.screen, self.figures.active.color, ((self.figures.active.pos[0] + cord[0]) * TILE,
-                                                (self.figures.active.pos[1] + cord[1]) * TILE, TILE, TILE))
+                                                                      (self.figures.active.pos[1] + cord[1]) * TILE,
+                                                                      TILE, TILE))
         for cord in self.figures.passive:
             pygame.draw.rect(self.screen, self.figures.passive[cord], (cord[0] * TILE, cord[1] * TILE, TILE, TILE))
-
 
         # rects
         for j in range(H):
             for i in range(W):
-                pygame.draw.rect(self.screen, WHITE, (i*TILE, j*TILE, TILE, TILE), 1)
-
-
-
+                pygame.draw.rect(self.screen, WHITE, (i * TILE, j * TILE, TILE, TILE), 1)
 
 
 main = Main()
