@@ -45,11 +45,10 @@ class Main:
         self.screen.fill(BLACK)
 
         # figures
-        for item in self.figures.passive + [self.figures.active]:
+        for cord in self.figures.passive + [(i[0] + self.figures.active.pos[0], i[1] + self.figures.active.pos[1])
+                                            for i in self.figures.active.cords]:
             try:
-                for cords in item.cords:
-                    pygame.draw.rect(self.screen, item.color, ((item.pos[0] + cords[0]) * TILE,
-                                                               (item.pos[1] + cords[1]) * TILE, TILE, TILE))
+                pygame.draw.rect(self.screen, RED, (cord[0] * TILE, cord[1] * TILE, TILE, TILE))
             except:
                 pass
 
