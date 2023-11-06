@@ -30,12 +30,6 @@ class Main:
                     if not self.figures.active.move(self.figures.colors, d_):
                         self.figures.add_to_passive()
 
-                        # lose
-                        for cord in self.figures.active.cords:
-                            if self.figures.colors[(cord[0] + self.figures.active.pos[0],
-                                                   cord[1] + self.figures.active.pos[1])] is not None:
-                                self.run = False
-
     def main_loop(self):
         while self.run:
             self.clock.tick(FPS)
@@ -43,6 +37,10 @@ class Main:
             if self.tick % FPS == 0:
                 if not self.figures.active.move(self.figures.colors, 1):
                     self.figures.add_to_passive()
+                    for cord in self.figures.active.cords:
+                        if self.figures.colors[(cord[0] + self.figures.active.pos[0],
+                                                cord[1] + self.figures.active.pos[1])] is not None:
+                            self.run = False
             pygame.display.set_caption(str(self.clock.get_fps()))
             self.events()
             self.render()

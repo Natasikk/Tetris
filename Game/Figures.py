@@ -53,6 +53,8 @@ class Figure:
         self.color = self.colors[i_]
         self.cords = self.cords_rotates[0]
         self.pos = [4, 0]
+        if i_ == 2:
+            self.pos = [3, 0]
 
     def rotate(self, colors):
         i_ = self.cords_rotates.index(self.cords)
@@ -72,7 +74,7 @@ class Figure:
         flag = True
         if direction == 0:
             for cord in self.cords:
-                if self.pos[0] + cord[0] > 8:
+                if self.pos[0] + cord[0] + 1 > 9:
                     flag = False
                 elif colors[(self.pos[0] + cord[0] + 1, self.pos[1] + cord[1])] is not None:
                     flag = False
@@ -81,7 +83,7 @@ class Figure:
 
         elif direction == 1:
             for cord in self.cords:
-                if self.pos[1] + cord[1] > 18:
+                if self.pos[1] + cord[1] + 1 > 19:
                     flag = False
                 elif colors[(self.pos[0] + cord[0], self.pos[1] + cord[1] + 1)] is not None:
                     flag = False
