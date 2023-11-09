@@ -6,6 +6,7 @@ class Figures:
     def __init__(self):
         self.colors = {(x, y): None for x in range(W) for y in range(H)}
         self.active = Figure()
+        self.score = 0
 
     def add_to_passive(self):
         for cord in self.active.cords:
@@ -15,6 +16,7 @@ class Figures:
         self.delete_line()
 
     def delete_line(self):
+        c_ = 1
         for y_ in range(H):
             count = []
             for cord in self.colors:
@@ -30,6 +32,8 @@ class Figures:
                         self.colors[cord] = None
                 for cord in del_:
                     self.colors[cord] = del_[cord]
+                self.score += c_ * 10
+                c_ += 1
 
 
 class Figure:
@@ -65,7 +69,9 @@ class Figure:
 
         flag = True
         for a_ in self.cords_rotates[i_]:
-            if colors[(self.pos[0] + a_[0], self.pos[1] + a_[1])] is not None:
+            if (self.pos[0] + a_[0] >= 10) or (self.pos[1] + a_[1] >= 20):
+                flag = False
+            elif colors[(self.pos[0] + a_[0], self.pos[1] + a_[1])] is not None:
                 flag = False
         if flag:
             self.cords = self.cords_rotates[i_]
