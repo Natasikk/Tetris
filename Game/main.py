@@ -43,9 +43,19 @@ class Main:
                 self.speed = 2.5
             elif self.figures.score < 500:
                 self.speed = 3
+            elif self.figures.score < 600:
+                self.speed = 3.5
+            elif self.figures.score < 700:
+                self.speed = 4
+            elif self.figures.score < 800:
+                self.speed = 4.5
+            elif self.figures.score < 900:
+                self.speed = 5
+            elif self.figures.score < 1000:
+                self.speed = 5.5
             self.clock.tick(FPS)
             self.tick += 1
-            if self.tick % (FPS * self.speed) == 0:
+            if self.tick % (FPS // self.speed) == 0:
                 if not self.figures.active.move(self.figures.colors, 1):
                     self.figures.add_to_passive()
                     for cord in self.figures.active.cords:
