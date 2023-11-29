@@ -6,13 +6,15 @@ class Figures:
     def __init__(self):
         self.colors = {(x, y): None for x in range(W) for y in range(H)}
         self.active = Figure()
+        self.next = Figure()
         self.score = 0
 
     def add_to_passive(self):
         for cord in self.active.cords:
             a_ = (cord[0] + self.active.pos[0], cord[1] + self.active.pos[1])
             self.colors[a_] = self.active.color
-        self.active = Figure()
+        self.active = self.next
+        self.next = Figure()
         self.delete_line()
 
     def delete_line(self):
