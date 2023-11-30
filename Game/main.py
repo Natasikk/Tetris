@@ -15,12 +15,18 @@ class Main:
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
+
+        pygame.mixer.music.load('music.mp3')
+        pygame.mixer.music.play(-1)
+        self.music_is_play = True
+
         self.run = True
         self.figures = Figures()
         self.tick = 0
         self.speed = 1
         self.best_score = 0
         self.pause_btn = (450, 550, 50, 50)
+        self.music_btn = (510, 550, 50, 50)
         self.return_btn = (225, 300, 125, 50)
         self.exit_to_menu_btn = (225, 375, 125, 50)
         self.pause = False
@@ -71,6 +77,13 @@ class Main:
                     if event.button == 1:
                         if in_box(pygame.mouse.get_pos(), self.pause_btn):
                             self.pause = True
+                        elif in_box(pygame.mouse.get_pos(), self.music_btn):
+                            if self.music_is_play:
+                                self.music_is_play = False
+                                pygame.mixer.music.pause()
+                            else:
+                                self.music_is_play = True
+                                pygame.mixer.music.unpause()
 
     def save_score(self):
         if self.figures.score > self.best_score:
@@ -135,9 +148,13 @@ class Main:
     def render(self):
         self.screen.fill(GREY)
 
+        # pause btn
         pygame.draw.rect(self.screen, WHITE, self.pause_btn, 2)
         pygame.draw.rect(self.screen, WHITE, (460, 555, 8, 40))
         pygame.draw.rect(self.screen, WHITE, (480, 555, 8, 40))
+
+        # music btn
+        pygame.draw.rect(self.screen, WHITE, self.music_btn, 2)
 
         # next
         pygame.draw.rect(self.screen, BLACK, (370, 400, 200, 120), 2)
