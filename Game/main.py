@@ -51,7 +51,6 @@ class Main:
                     if event.button == 1:
                         if in_box(pygame.mouse.get_pos(), self.start_btn):
                             self.menu = False
-                            self.tick = 0
                             self.figures = Figures()
                             file = open('best_score.txt', 'r')
                             self.best_score = int(file.read())
@@ -65,7 +64,6 @@ class Main:
                         elif in_box(pygame.mouse.get_pos(), self.restart_btn):
                             self.pause = False
                             self.save_score()
-                            self.tick = 0
                             self.figures = Figures()
                             file = open('best_score.txt', 'r')
                             self.best_score = int(file.read())
@@ -106,7 +104,6 @@ class Main:
 
     def save_score(self):
         if self.figures.score > self.best_score:
-            print('f')
             file = open('best_score.txt', 'w')
             file.write(str(self.figures.score))
 
@@ -114,35 +111,36 @@ class Main:
         while self.run:
             self.clock.tick(FPS)
             self.events()
-            if self.figures.score < 100:
-                self.speed = 1
-            elif self.figures.score < 200:
-                self.speed = 1.5
-            elif self.figures.score < 300:
-                self.speed = 2
-            elif self.figures.score < 400:
-                self.speed = 2.5
-            elif self.figures.score < 500:
-                self.speed = 3
-            elif self.figures.score < 600:
-                self.speed = 3.5
-            elif self.figures.score < 700:
-                self.speed = 4
-            elif self.figures.score < 800:
-                self.speed = 4.5
-            elif self.figures.score < 900:
-                self.speed = 5
-            elif self.figures.score < 1000:
-                self.speed = 5.5
-            self.tick += 1
-            if self.tick % (FPS // self.speed) == 0:
-                if not self.figures.active.move(self.figures.colors, 1):
-                    self.figures.add_to_passive()
-                    for cord in self.figures.active.cords:
-                        if self.figures.colors[(cord[0] + self.figures.active.pos[0],
-                                                cord[1] + self.figures.active.pos[1])] is not None:
-                            self.menu = True
-                            self.save_score()
+            if not self.pause:
+                if self.figures.score < 100:
+                    self.speed = 1
+                elif self.figures.score < 200:
+                    self.speed = 1.5
+                elif self.figures.score < 300:
+                    self.speed = 2
+                elif self.figures.score < 400:
+                    self.speed = 2.5
+                elif self.figures.score < 500:
+                    self.speed = 3
+                elif self.figures.score < 600:
+                    self.speed = 3.5
+                elif self.figures.score < 700:
+                    self.speed = 4
+                elif self.figures.score < 800:
+                    self.speed = 4.5
+                elif self.figures.score < 900:
+                    self.speed = 5
+                elif self.figures.score < 1000:
+                    self.speed = 5.5
+                self.tick += 1
+                if self.tick % (FPS // self.speed) == 0:
+                    if not self.figures.active.move(self.figures.colors, 1):
+                        self.figures.add_to_passive()
+                        for cord in self.figures.active.cords:
+                            if self.figures.colors[(cord[0] + self.figures.active.pos[0],
+                                                    cord[1] + self.figures.active.pos[1])] is not None:
+                                self.menu = True
+                                self.save_score()
             self.render()
         pygame.quit()
 
@@ -166,7 +164,7 @@ class Main:
             pygame.draw.rect(self.screen, GREY, (175, 175, 225, 325))
             pygame.draw.rect(self.screen, WHITE, (175, 175, 225, 325), 3)
             pygame.draw.rect(self.screen, GREEN, self.return_btn)
-            pygame.draw.rect(self.screen, YELLOW, self.restart_btn)
+            pygame.draw.rect(self.screen, ORANGE, self.restart_btn)
             pygame.draw.rect(self.screen, RED, self.exit_to_menu_btn)
 
             f1 = pygame.font.Font(None, 50)
