@@ -14,11 +14,16 @@ class Main:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("Tetris")
         self.clock = pygame.time.Clock()
 
         pygame.mixer.music.load('music.mp3')
         pygame.mixer.music.play(-1)
         self.music_is_play = True
+        self.sound_yes_img = pygame.image.load('sound+.png').convert_alpha()
+        self.sound_yes_img = pygame.transform.scale(self.sound_yes_img, (40, 40))
+        self.sound_no_img = pygame.image.load('sound-.png').convert_alpha()
+        self.sound_no_img = pygame.transform.scale(self.sound_no_img, (40, 40))
 
         self.run = True
         self.figures = Figures()
@@ -27,8 +32,13 @@ class Main:
         self.best_score = 0
         self.pause_btn = (450, 550, 50, 50)
         self.music_btn = (510, 550, 50, 50)
-        self.return_btn = (225, 300, 125, 50)
-        self.exit_to_menu_btn = (225, 375, 125, 50)
+        self.start_btn = (200, 300, 175, 50)
+        self.exit_from_game_btn = (200, 370, 175, 50)
+
+        self.return_btn = (200, 270, 175, 50)
+        self.restart_btn = (200, 345, 175, 50)
+        self.exit_to_menu_btn = (200, 420, 175, 50)
+
         self.pause = False
         self.menu = True
 
@@ -39,17 +49,26 @@ class Main:
             if self.menu:
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
-                        if in_box(pygame.mouse.get_pos(), self.return_btn):
+                        if in_box(pygame.mouse.get_pos(), self.start_btn):
                             self.menu = False
                             self.tick = 0
                             self.figures = Figures()
                             file = open('best_score.txt', 'r')
                             self.best_score = int(file.read())
+                        elif in_box(pygame.mouse.get_pos(), self.exit_from_game_btn):
+                            self.run = False
             elif self.pause:
                 if event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
                         if in_box(pygame.mouse.get_pos(), self.return_btn):
                             self.pause = False
+                        elif in_box(pygame.mouse.get_pos(), self.restart_btn):
+                            self.pause = False
+                            self.save_score()
+                            self.tick = 0
+                            self.figures = Figures()
+                            file = open('best_score.txt', 'r')
+                            self.best_score = int(file.read())
                         elif in_box(pygame.mouse.get_pos(), self.exit_to_menu_btn):
                             self.pause = False
                             self.menu = True
@@ -95,100 +114,117 @@ class Main:
         while self.run:
             self.clock.tick(FPS)
             self.events()
-            if self.menu:
-                self.screen.fill(GREY)
-                pygame.draw.rect(self.screen, WHITE, (175, 175, 225, 325), 3)
-                pygame.draw.rect(self.screen, GREEN, self.return_btn)
-                f1 = pygame.font.Font(None, 60)
-                text = f1.render(str('MENU'), True, WHITE)
-                self.screen.blit(text, (218, 220))
-            elif self.pause:
-                pygame.draw.rect(self.screen, GREY, (175, 175, 225, 325))
-                pygame.draw.rect(self.screen, WHITE, (175, 175, 225, 325), 3)
-                pygame.draw.rect(self.screen, GREEN, self.return_btn)
-                pygame.draw.rect(self.screen, RED, self.exit_to_menu_btn)
-                f1 = pygame.font.Font(None, 60)
-                text = f1.render(str('PAUSE'), True, WHITE)
-                self.screen.blit(text, (218, 220))
-            else:
-                if self.figures.score < 100:
-                    self.speed = 1
-                elif self.figures.score < 200:
-                    self.speed = 1.5
-                elif self.figures.score < 300:
-                    self.speed = 2
-                elif self.figures.score < 400:
-                    self.speed = 2.5
-                elif self.figures.score < 500:
-                    self.speed = 3
-                elif self.figures.score < 600:
-                    self.speed = 3.5
-                elif self.figures.score < 700:
-                    self.speed = 4
-                elif self.figures.score < 800:
-                    self.speed = 4.5
-                elif self.figures.score < 900:
-                    self.speed = 5
-                elif self.figures.score < 1000:
-                    self.speed = 5.5
-                self.tick += 1
-                if self.tick % (FPS // self.speed) == 0:
-                    if not self.figures.active.move(self.figures.colors, 1):
-                        self.figures.add_to_passive()
-                        for cord in self.figures.active.cords:
-                            if self.figures.colors[(cord[0] + self.figures.active.pos[0],
-                                                    cord[1] + self.figures.active.pos[1])] is not None:
-                                self.menu = True
-                                self.save_score()
-                pygame.display.set_caption(str(self.clock.get_fps()))
-                self.render()
-            pygame.display.update()
+            if self.figures.score < 100:
+                self.speed = 1
+            elif self.figures.score < 200:
+                self.speed = 1.5
+            elif self.figures.score < 300:
+                self.speed = 2
+            elif self.figures.score < 400:
+                self.speed = 2.5
+            elif self.figures.score < 500:
+                self.speed = 3
+            elif self.figures.score < 600:
+                self.speed = 3.5
+            elif self.figures.score < 700:
+                self.speed = 4
+            elif self.figures.score < 800:
+                self.speed = 4.5
+            elif self.figures.score < 900:
+                self.speed = 5
+            elif self.figures.score < 1000:
+                self.speed = 5.5
+            self.tick += 1
+            if self.tick % (FPS // self.speed) == 0:
+                if not self.figures.active.move(self.figures.colors, 1):
+                    self.figures.add_to_passive()
+                    for cord in self.figures.active.cords:
+                        if self.figures.colors[(cord[0] + self.figures.active.pos[0],
+                                                cord[1] + self.figures.active.pos[1])] is not None:
+                            self.menu = True
+                            self.save_score()
+            self.render()
         pygame.quit()
 
     def render(self):
-        self.screen.fill(GREY)
+        if self.menu:
+            self.screen.fill(GREY)
+            pygame.draw.rect(self.screen, WHITE, (175, 175, 225, 325), 3)
+            pygame.draw.rect(self.screen, GREEN, self.start_btn)
+            pygame.draw.rect(self.screen, RED, self.exit_from_game_btn)
 
-        # pause btn
-        pygame.draw.rect(self.screen, WHITE, self.pause_btn, 2)
-        pygame.draw.rect(self.screen, WHITE, (460, 555, 8, 40))
-        pygame.draw.rect(self.screen, WHITE, (480, 555, 8, 40))
+            f1 = pygame.font.Font(None, 60)
+            text = f1.render(str('MENU'), True, WHITE)
+            text1 = f1.render(str('START'), True, WHITE)
+            text2 = f1.render(str('EXIT'), True, WHITE)
+            self.screen.blit(text, (227, 220))
+            self.screen.blit(text1, (220, 308))
+            self.screen.blit(text2, (235, 377))
 
-        # music btn
-        pygame.draw.rect(self.screen, WHITE, self.music_btn, 2)
+        elif self.pause:
 
-        # next
-        pygame.draw.rect(self.screen, BLACK, (370, 400, 200, 120), 2)
-        for cord in self.figures.next.cords:
-            pygame.draw.rect(self.screen, self.figures.next.color, (400 + cord[0] * TILE, 420 + cord[1] * TILE, TILE, TILE))
-            pygame.draw.rect(self.screen, BLACK, (400 + cord[0] * TILE, 420 + cord[1] * TILE, TILE, TILE), 1)
+            pygame.draw.rect(self.screen, GREY, (175, 175, 225, 325))
+            pygame.draw.rect(self.screen, WHITE, (175, 175, 225, 325), 3)
+            pygame.draw.rect(self.screen, GREEN, self.return_btn)
+            pygame.draw.rect(self.screen, YELLOW, self.restart_btn)
+            pygame.draw.rect(self.screen, RED, self.exit_to_menu_btn)
 
-        # active
-        for cord in self.figures.active.cords:
-            pygame.draw.rect(self.screen, self.figures.active.color, ((self.figures.active.pos[0] + cord[0]) * TILE,
-                                                                      (self.figures.active.pos[1] + cord[1]) * TILE,
-                                                                      TILE, TILE))
-        # passive
-        for cord in self.figures.colors:
-            if self.figures.colors[cord] is not None:
-                pygame.draw.rect(self.screen, self.figures.colors[cord], (cord[0] * TILE, cord[1] * TILE, TILE, TILE))
+            f1 = pygame.font.Font(None, 50)
+            text = f1.render(str('PAUSE'), True, WHITE)
+            text1 = f1.render(str('RETURN'), True, WHITE)
+            text2 = f1.render('RESTART', True, WHITE)
+            text3 = f1.render('MENU', True, WHITE)
+            self.screen.blit(text, (230, 200))
+            self.screen.blit(text1, (215, 280))
+            self.screen.blit(text2, (205, 355))
+            self.screen.blit(text3, (235, 428))
+        else:
+            self.screen.fill(GREY)
 
-        # rects
-        for j in range(H):
-            for i in range(W):
-                pygame.draw.rect(self.screen, BLACK, (i * TILE, j * TILE, TILE, TILE), 1)
+            # pause btn
+            pygame.draw.rect(self.screen, WHITE, self.pause_btn, 2)
+            pygame.draw.rect(self.screen, WHITE, (460, 555, 8, 40))
+            pygame.draw.rect(self.screen, WHITE, (480, 555, 8, 40))
 
-        # score
-        f1 = pygame.font.Font(None, 40)
-        text = f1.render(str('SCORE'), True, WHITE)
-        text1 = f1.render(str(self.figures.score), True, WHITE)
-        self.screen.blit(text, (420, 50))
-        self.screen.blit(text1, (460, 100))
+            # music btn
+            pygame.draw.rect(self.screen, WHITE, self.music_btn)
+            self.screen.blit(self.sound_yes_img if self.music_is_play else self.sound_no_img, (515, 555))
 
-        # best_score
-        text = f1.render(str('BEST_SCORE'), True, WHITE)
-        text1 = f1.render(str(self.best_score), True, WHITE)
-        self.screen.blit(text, (380, 150))
-        self.screen.blit(text1, (460, 200))
+            # next
+            pygame.draw.rect(self.screen, BLACK, (370, 400, 200, 120), 2)
+            for cord in self.figures.next.cords:
+                pygame.draw.rect(self.screen, self.figures.next.color, (400 + cord[0] * TILE, 420 + cord[1] * TILE, TILE, TILE))
+                pygame.draw.rect(self.screen, BLACK, (400 + cord[0] * TILE, 420 + cord[1] * TILE, TILE, TILE), 1)
+
+            # active
+            for cord in self.figures.active.cords:
+                pygame.draw.rect(self.screen, self.figures.active.color, ((self.figures.active.pos[0] + cord[0]) * TILE,
+                                                                          (self.figures.active.pos[1] + cord[1]) * TILE,
+                                                                          TILE, TILE))
+            # passive
+            for cord in self.figures.colors:
+                if self.figures.colors[cord] is not None:
+                    pygame.draw.rect(self.screen, self.figures.colors[cord], (cord[0] * TILE, cord[1] * TILE, TILE, TILE))
+
+            # rects
+            for j in range(H):
+                for i in range(W):
+                    pygame.draw.rect(self.screen, BLACK, (i * TILE, j * TILE, TILE, TILE), 1)
+
+            # score
+            f1 = pygame.font.Font(None, 40)
+            text = f1.render(str('SCORE'), True, WHITE)
+            text1 = f1.render(str(self.figures.score), True, WHITE)
+            self.screen.blit(text, (420, 50))
+            self.screen.blit(text1, (460, 100))
+
+            # best_score
+            text = f1.render(str('BEST SCORE'), True, WHITE)
+            text1 = f1.render(str(self.best_score), True, WHITE)
+            self.screen.blit(text, (380, 150))
+            self.screen.blit(text1, (445, 200))
+
+        pygame.display.update()
 
 
 main = Main()
